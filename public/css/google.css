@@ -1,0 +1,30 @@
+.google {
+    color: green;
+}
+
+h2, h3 {
+    text-align: center;
+}
+
+p {
+    font-size: 18px;
+}
+
+.container {
+    text-align: justify;
+    max-width: 600px;
+    margin: auto;
+    font-family: Helvetica Neue, Helvetica, sans-serif
+}
+
+.credentials {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: start;
+}
+
+.empty {
+    margin: 0;
+    padding: 0;
+}

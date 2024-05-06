@@ -1,0 +1,86 @@
+
+version: '3'
+services:
+  nginx:
+    build:
+      context: ./
+      dockerfile: docker/nginx.docker
+    volumes:
+      - ./:/var/www
+    ports:
+      - "8080:80"
+    links:
+      - php-fpm
+  php-fpm:
+    build:
+      context: ./
+      dockerfile: docker/php-fpm.docker
+    volumes:
+      - ./:/var/www
+    links:
+      - mysql
+      - redis
+    environment:
+      - "DB_HOST=mysql"
+      - "DB_PORT=3306"
+      - "REDIS_HOST=redis"
+      - "REDIS_PORT=6379"
+  php-cli:
+    build:
+      context: ./
+      dockerfile: docker/php-cli.docker
+    volumes:
+      - ./:/var/www
+    links:
+      - mysql
+      - redis
+    environment:
+      - "DB_PORT=3306"
+      - "DB_HOST=mysql"
+      - "REDIS_HOST=redis"
+      - "REDIS_PORT=6379"
+    tty: true
+  mysql:
+    platform: linux/x86_64
+    image: mysql
+    volumes:
+      - ./storage/docker/mysql:/var/lib/mysql
+    environment:
+      - "MYSQL_ROOT_PASSWORD=secret"
+      - "MYSQL_USER=admin"
+      - "MYSQL_PASSWORD=secret"
+      - "MYSQL_DATABASE=startupium"
+    ports:
+      - "33061:3306"
+  mysql_test:
+    platform: linux/x86_64
+    image: mysql
+    volumes:
+      - ./storage/docker/mysql_test:/var/lib/mysql_test
+    environment:
+      - "MYSQL_ROOT_PASSWORD=secret_test"
+      - "MYSQL_USER=admin_test"
+      - "MYSQL_PASSWORD=secret_test"
+      - "MYSQL_DATABASE=startupium_test"
+    ports:
+      - "33062:3306"
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  mailer:
+    image: mailhog/mailhog
+    container_name: 'mailhog'
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+  centrifugo:
+    container_name: centrifugo
+    image: centrifugo/centrifugo:latest
+    volumes:
+      - ./docker/centrifugo.json:/centrifugo/centrifugo.json
+    command: centrifugo -c centrifugo.json --port=8086 --admin
+    ports:
+      - 8086:8086
+
+
